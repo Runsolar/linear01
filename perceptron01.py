@@ -31,7 +31,7 @@ class Perceptron(object):
                 #print(self.w)
 
             self.errors.append(error_)
-            
+
         return self
     
     def net_input(self, x):
@@ -48,15 +48,15 @@ if __name__ == "__main__":
 
     y = np.where(irises.iloc[1:100, -1] == 'Iris-setosa', 1, -1)
 
-    X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
+    #X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
 
     obj1  = Perceptron()
 
     obj1.fit(X, y)
 
-    exmaple = X[60, :]
+    example = X[60, :]
 
-    print(obj1.predict(exmaple))
+    print(obj1.predict(example))
 
 
     print(obj1.errors)
