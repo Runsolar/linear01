@@ -1,6 +1,8 @@
 
 import numpy as np
 import pandas as pd
+import random
+import matplotlib.pyplot as plt
 
 class Perceptron(object):
 
@@ -40,26 +42,62 @@ class Perceptron(object):
     def predict(self, x):
         return np.where(self.net_input(x) >= 0.0, 1, -1)
 
+
+def train_test_split(x_input, y_input, test_percent, mixing):
+    x_train, x_test, y_train, y_test = [], [], [], []
+
+    train_percent = 1 - test_percent
+
+    if mixing:
+
+        mixed = list(zip(x_input, y_input))
+        random.shuffle(mixed)
+
+        mixed_train = mixed[:int(train_percent*len(mixed))]
+        mixed_test = mixed[int(train_percent*len(mixed)):]
+
+        for val1, val2 in zip(mixed_train, mixed_test):
+
+            x_train.append(val1[0])
+            y_train.append(val1[1])
+            x_test.append(val2[0])
+            y_test.append(val2[1])
+
+    else:
+
+        x_train, x_test = x_input[:int(train_percent*len(x_input))], x_input[int(train_percent*len(x_input)):]
+        y_train, y_test = y_input[:int(train_percent*len(y_input))], y_input[int(train_percent*len(y_input)):]
+
+    return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
+
+
 if __name__ == "__main__":
 
     irises = pd.read_csv('iris.csv', header=None, encoding='utf-8')
 
-    X = np.array(irises.iloc[1:100, [2, 4]])
+    X = np.array(irises.iloc[1:100, [2, 4]]) 
+
+    X_train_setosa = np.array(irises.iloc[1:36, [2, 4]])
+
+    X_train_versicolor = np.array(irises.iloc[51:86, [2, 4]])
+
+    X_train_virginica = np.array(irises.iloc[101:136, [2, 4]])
 
     y = np.where(irises.iloc[1:100, -1] == 'Iris-setosa', 1, -1)
 
-    #X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
+    X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
 
     obj1  = Perceptron()
 
-    obj1.fit(X, y)
+    obj1.fit(X_train, y_train)
 
-    example = X[60, :]
+    example = X_train
 
     print(obj1.predict(example))
 
-
     print(obj1.errors)
 
-
-    
+    plt.plot(range(1, len(obj1.errors) + 1) , obj1.errors)
+    plt.title('Количество ошибок классификации')
+    plt.grid(True)
+    plt.show()
