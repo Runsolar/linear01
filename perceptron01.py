@@ -71,6 +71,28 @@ def train_test_split(x_input, y_input, test_percent, mixing):
     return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
 
+def plot_boundary_solutions(X, y, resolution, perc):
+    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
+    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+
+    x1_mesh, x2_mesh = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                                   np.arange(x2_min, x2_max, resolution))
+    
+    y_pred = perc.predict(np.array([x1_mesh.ravel(), x2_mesh.ravel()]).transpose()).reshape(x1_mesh.shape)
+
+    plt.contourf(x1_mesh, x2_mesh, y_pred, colors=['red', 'blue'], alpha=0.5)
+
+    plt.scatter(X[y == 1, 0], X[y == 1, 1], color='blue', alpha=0.5, label='1')
+    plt.scatter(X[y == -1, 0], X[y == -1, 1], color='red', alpha=0.5, label='-1')
+
+    plt.xlim(x1_mesh.min(), x1_mesh.max())
+    plt.ylim(x2_mesh.min(), x2_mesh.max())
+
+    plt.legend()
+
+    plt.show()
+
+
 if __name__ == "__main__":
 
     irises = pd.read_csv('iris.csv', header=None, encoding='utf-8')
@@ -101,3 +123,5 @@ if __name__ == "__main__":
     plt.title('Количество ошибок классификации')
     plt.grid(True)
     plt.show()
+
+    plot_boundary_solutions(X_test, y_test, 0.02, obj1)
