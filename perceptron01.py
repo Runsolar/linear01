@@ -1,4 +1,5 @@
 
+from matplotlib.colors import ListedColormap
 import numpy as np
 import pandas as pd
 import random
@@ -42,6 +43,14 @@ class Perceptron(object):
     def predict(self, x):
         return np.where(self.net_input(x) >= 0.0, 1, -1)
 
+    def model_save():
+        pass
+    #perceptron01.mdl
+    def model_load():
+        pass
+
+
+
 
 def train_test_split(x_input, y_input, test_percent, mixing):
     x_train, x_test, y_train, y_test = [], [], [], []
@@ -71,23 +80,31 @@ def train_test_split(x_input, y_input, test_percent, mixing):
     return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
 
 
-def plot_boundary_solutions(X, y, resolution, perc):
-    x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
-    x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+def plot_boundary_solutions(X, y, classifier, resolution=0.2):
+
+    markers = ('s', 'x', 'o')
+    colors = ('red', 'blue', 'lightgreen', 'gray')
+
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 
     x1_mesh, x2_mesh = np.meshgrid(np.arange(x1_min, x1_max, resolution),
                                    np.arange(x2_min, x2_max, resolution))
-    
-    y_pred = perc.predict(np.array([x1_mesh.ravel(), x2_mesh.ravel()]).transpose()).reshape(x1_mesh.shape)
 
-    plt.contourf(x1_mesh, x2_mesh, y_pred, colors=['red', 'blue'], alpha=0.5)
+    y_pred = classifier.predict(np.array([x1_mesh.ravel(), x2_mesh.ravel()]).transpose()).reshape(x1_mesh.shape)
 
-    plt.scatter(X[y == 1, 0], X[y == 1, 1], color='blue', alpha=0.5, label='1')
-    plt.scatter(X[y == -1, 0], X[y == -1, 1], color='red', alpha=0.5, label='-1')
-
+    plt.contourf(x1_mesh, x2_mesh, y_pred, cmap=cmap, alpha=0.3)
     plt.xlim(x1_mesh.min(), x1_mesh.max())
     plt.ylim(x2_mesh.min(), x2_mesh.max())
 
+    for idx, cl in enumerate(np.unique(y)):
+        plt.scatter(x=X[y == cl, 0], y=X[y == cl, 1], 
+            color=colors[idx], alpha=0.8, 
+            label=cl, marker=markers[idx], edgecolor='black')
+
+    
     plt.legend()
 
     plt.show()
@@ -124,4 +141,4 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.show()
 
-    plot_boundary_solutions(X_test, y_test, 0.02, obj1)
+    plot_boundary_solutions(X_test, y_test, obj1)
