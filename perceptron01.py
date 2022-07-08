@@ -11,6 +11,7 @@ class Perceptron(object):
         self.n_iter = n_iter
         self.eta = eta
         self.random_state = random_state
+        self.w_arr = []
 
     def fit(self, X, y):
 
@@ -34,6 +35,8 @@ class Perceptron(object):
                 #print(self.w)
 
             self.errors.append(error_)
+        
+        self.model_save()
 
         return self
     
@@ -43,102 +46,13 @@ class Perceptron(object):
     def predict(self, x):
         return np.where(self.net_input(x) >= 0.0, 1, -1)
 
-    def model_save():
-        pass
-    #perceptron01.mdl
-    def model_load():
-        pass
+    def model_save(self):
+        ind = self.errors.index(min(self.errors))
+        w_ = str(self.w_arr[ind])
+        with open("perceptron01.mdl", "w") as file:
+            file.write(w_)
 
-
-
-
-def train_test_split(x_input, y_input, test_percent, mixing):
-    x_train, x_test, y_train, y_test = [], [], [], []
-
-    train_percent = 1 - test_percent
-
-    if mixing:
-
-        mixed = list(zip(x_input, y_input))
-        random.shuffle(mixed)
-
-        mixed_train = mixed[:int(train_percent*len(mixed))]
-        mixed_test = mixed[int(train_percent*len(mixed)):]
-
-        for val1, val2 in zip(mixed_train, mixed_test):
-
-            x_train.append(val1[0])
-            y_train.append(val1[1])
-            x_test.append(val2[0])
-            y_test.append(val2[1])
-
-    else:
-
-        x_train, x_test = x_input[:int(train_percent*len(x_input))], x_input[int(train_percent*len(x_input)):]
-        y_train, y_test = y_input[:int(train_percent*len(y_input))], y_input[int(train_percent*len(y_input)):]
-
-    return np.array(x_train), np.array(y_train), np.array(x_test), np.array(y_test)
-
-
-def plot_boundary_solutions(X, y, classifier, resolution=0.2):
-
-    markers = ('s', 'x', 'o')
-    colors = ('red', 'blue', 'lightgreen', 'gray')
-
-    cmap = ListedColormap(colors[:len(np.unique(y))])
-
-    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-
-    x1_mesh, x2_mesh = np.meshgrid(np.arange(x1_min, x1_max, resolution),
-                                   np.arange(x2_min, x2_max, resolution))
-
-    y_pred = classifier.predict(np.array([x1_mesh.ravel(), x2_mesh.ravel()]).transpose()).reshape(x1_mesh.shape)
-
-    plt.contourf(x1_mesh, x2_mesh, y_pred, cmap=cmap, alpha=0.3)
-    plt.xlim(x1_mesh.min(), x1_mesh.max())
-    plt.ylim(x2_mesh.min(), x2_mesh.max())
-
-    for idx, cl in enumerate(np.unique(y)):
-        plt.scatter(x=X[y == cl, 0], y=X[y == cl, 1], 
-            color=colors[idx], alpha=0.8, 
-            label=cl, marker=markers[idx], edgecolor='black')
-
-    
-    plt.legend()
-
-    plt.show()
-
-
-if __name__ == "__main__":
-
-    irises = pd.read_csv('iris.csv', header=None, encoding='utf-8')
-
-    X = np.array(irises.iloc[1:100, [2, 4]]) 
-
-    X_train_setosa = np.array(irises.iloc[1:36, [2, 4]])
-
-    X_train_versicolor = np.array(irises.iloc[51:86, [2, 4]])
-
-    X_train_virginica = np.array(irises.iloc[101:136, [2, 4]])
-
-    y = np.where(irises.iloc[1:100, -1] == 'Iris-setosa', 1, -1)
-
-    X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
-
-    obj1  = Perceptron()
-
-    obj1.fit(X_train, y_train)
-
-    example = X_train
-
-    print(obj1.predict(example))
-
-    print(obj1.errors)
-
-    plt.plot(range(1, len(obj1.errors) + 1) , obj1.errors)
-    plt.title('Количество ошибок классификации')
-    plt.grid(True)
-    plt.show()
-
-    plot_boundary_solutions(X_test, y_test, obj1)
+    def model_load(self):
+        with open("perceptron01.mdl", "r") as file:
+            res = file.readline()
+        return res
