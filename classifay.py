@@ -1,20 +1,22 @@
-from numpy import array, where
+
 import pandas as pd
-import matplotlib.pyplot as plt
-from perceptron01 import Perceptron
+from perceptron02 import Perceptron
 from data_preparation import train_test_split
 from visualization import plot_boundary_solutions, plot_graph
 
 
 irises = pd.read_csv('iris.csv', header=None, encoding='utf-8')
 
-X = array(irises.iloc[1:100, [2, 4]])
+X = (irises.iloc[1:100, [2, 4]]).values.tolist()
 
-y = where(irises.iloc[1:100, -1] == 'Iris-setosa', 1, -1)
+y = (irises.iloc[1:100, -1])
+y = y.where(y == 'Iris-setosa', -1)
+y = y.where(y != 'Iris-setosa', 1)
+y = y.values.tolist()
 
 X_train, y_train, X_test, y_test = train_test_split(X, y, 0.3, True)
 
-obj1  = Perceptron()
+obj1 = Perceptron(eta0=0.1, random_state=1)
 
 obj1.fit(X_train, y_train)
 
